@@ -11,7 +11,6 @@ class Game
     @player = Player.new(player_name)
     @dealer = Dealer.new
     @bank = Bank.new
-    deal
   end
 
   def deal
@@ -19,8 +18,8 @@ class Game
     player.money -= BET
     dealer.money -= BET
     bank.money += BET * 2
-    take_card(player)
-    take_card(dealer)
+    2.times { take_card(player) }
+    2.times { take_card(dealer) }
   end
 
   def take_card(user)
@@ -30,17 +29,15 @@ class Game
   def open_card
     player_score = player.score
     dealer_score = dealer.score
-
     spot_winner(player_score, dealer_score)
-    if spot_winner == dealer_score
-      puts 'Вы проиграли'
-    else
-      puts 'Поздравляем с победой!'
-    end
   end
 
   def dealer_turn
-    take_card(dealer) if dealer.score < 17
+    if dealer.score >= 17
+      puts 'Дилер пропускает ход'
+    else
+      take_card(dealer)
+    end
   end
 
   def deal_result
@@ -51,6 +48,7 @@ class Game
     player_score = player.score
     dealer_score = dealer.score
     count_money(player_score, dealer_score)
+    who_win(player_score, dealer_score)
   end
 
   def spot_winner(player_score, dealer_score)
@@ -74,5 +72,18 @@ class Game
       player.money += bank.money / 2
       dealer.money += bank.money / 2
     end
+    @bank.money = 0
+  end
+
+  def who_win(player_score, dealer_score)
+    winner = spot_winner(player_score, dealer_score)
+    if winner == player
+      puts "#{player_name}, вы победили"
+    elsif winner == dealer
+      puts 'Победа за Дилером! Вы проиграли'
+    else
+      puts 'Победителя нет'
+    end
+    puts '*' * 70
   end
 end

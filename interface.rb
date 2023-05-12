@@ -14,9 +14,13 @@ class Interface
   MENU = [
     { id: 0, title: 'Выйти из игры', action: :exit },
     { id: 1, title: 'Начать игру', action: :start },
-    { id: 2, title: 'Взять карту', action: :take_card },
-    { id: 3, title: 'Открыть карты', action: :deal_cycle }
+    { id: 2, title: 'Добавить карту', action: :take_card },
+    { id: 3, title: 'Пропустить', action: :miss },
+    { id: 4, title: 'Открыть карты', action: :deal_cycle }
   ].freeze
+
+  BLACKJACK = 21
+  BET = 10
 
   def initialize
     @game = game
@@ -47,14 +51,19 @@ class Interface
   def start
     puts 'Введите ваше имя'
     @player_name = gets.strip
-    puts 'Раздача карт'
     @game = Game.new(player_name)
+    puts "У Вас в банке #{game.player.money}$"
+    puts "Размер одной ставки - #{BET}$"
+    puts "Удачи, #{player_name}"
+    puts '*' * 70
+    puts 'Раздача карт:'
     game.deal
+
     show_cards
   end
 
   def miss
-    game.dealer_turn if game.add_card?
+    game.dealer_turn
     deal_cycle
   end
 
@@ -62,6 +71,16 @@ class Interface
     game.take_card(game.player)
     game.dealer_turn
     game.deal_result ? deal_cycle : show_cards
+  end
+
+  def next_round
+    game.player.used_cards = []
+    game.dealer.used_cards = []
+    puts "У Вас в банке #{game.player.money}$"
+    puts 'Раздача карт:'
+    puts
+    game.deal
+    show_cards
   end
 
   def deal_cycle
@@ -72,7 +91,7 @@ class Interface
   end
 
   def show_player_cards(player, value = nil)
-    puts "#{player.name} у вас на руках (#{value} очков): "
+    puts "#{player.name} у вас на руках (#{value} points): "
   end
 
   def hidden_dealer_card(amount)
@@ -110,29 +129,15 @@ class Interface
     puts "Dealer money: #{dealer.money}"
   end
 
-  def show_dealer_hand
-    puts 'У Вас на руках:'
-  end
-
   def continue?
     puts 'Вы желаете продолжить игру? 1 - да, 0 - нет'
     answer = gets.chomp
     case answer
     when '1'
-      start
+      next_round
     when '0'
       exit
     end
   end
-
-  def dealer_turn
-    if dealer.count_points >= 17
-      puts 'Дилер пропускает ход'
-    else
-      take_card(dealer)
-    end
-    check
-  end
 end
-
 Interface.new.program
