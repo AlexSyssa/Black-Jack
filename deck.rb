@@ -12,7 +12,7 @@ class Deck
 
   def generate_deck
     SUITS.each do |suit|
-      (2..10).each do |number|
+      (2..9).each do |number|
         @cards << Card.new(suit, number)
       end
       %w[J Q K A].each do |name|

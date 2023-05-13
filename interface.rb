@@ -1,22 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'bank'
-require_relative 'card'
-require_relative 'deck'
-require_relative 'game'
-require_relative 'gamer'
-require_relative 'dealer'
-require_relative 'player'
-
 class Interface
   attr_accessor :game, :player_name
 
   MENU = [
     { id: 0, title: 'Выйти из игры', action: :exit },
-    { id: 1, title: 'Начать игру', action: :start },
-    { id: 2, title: 'Добавить карту', action: :take_card },
-    { id: 3, title: 'Пропустить', action: :miss },
-    { id: 4, title: 'Открыть карты', action: :deal_cycle }
+    { id: 1, title: 'Добавить карту', action: :take_card },
+    { id: 2, title: 'Пропустить', action: :miss },
+    { id: 3, title: 'Открыть карты', action: :deal_cycle }
   ].freeze
 
   BLACKJACK = 21
@@ -30,7 +21,6 @@ class Interface
   def start_menu
     puts ''
     puts ''
-    puts 'Меню:'
     MENU.each do |item|
       puts "#{item[:id]} - #{item[:title]}"
     end
@@ -39,7 +29,7 @@ class Interface
   def program
     loop do
       start_menu
-      puts 'Выберите необходимое действие и введите соответствующую цифру:'
+      puts 'Выберите действие и введите соответствующую цифру:'
       choice = gets.chomp.to_i
       break if choice.zero?
 
@@ -49,17 +39,27 @@ class Interface
   end
 
   def start
+    welcome
+    puts 'Вы желаете начать игру? 1 - да, 0 - нет'
+    answer = gets.chomp
+    case answer
+    when '1'
+      next_round
+    when '0'
+      'До скорой встречи!'
+    end
+  end
+
+  def welcome
+    puts 'Игра Black Jack'
+    puts
     puts 'Введите ваше имя'
     @player_name = gets.strip
     @game = Game.new(player_name)
-    puts "У Вас в банке #{game.player.money}$"
+    puts "У Вас в банке - #{game.player.money}$"
     puts "Размер одной ставки - #{BET}$"
     puts "Удачи, #{player_name}"
     puts '*' * 70
-    puts 'Раздача карт:'
-    game.deal
-
-    show_cards
   end
 
   def miss
@@ -81,17 +81,18 @@ class Interface
     puts
     game.deal
     show_cards
+    program
   end
 
   def deal_cycle
-    game.open_cards
     show_cards_when_open
+    game.open_cards
     show_players_money(game.player, game.dealer)
     continue?
   end
 
   def show_player_cards(player, value = nil)
-    puts "#{player.name} у вас на руках (#{value} points): "
+    puts "#{player.name}, у вас на руках (#{value} points): "
   end
 
   def hidden_dealer_card(amount)
@@ -136,8 +137,11 @@ class Interface
     when '1'
       next_round
     when '0'
-      exit
+      puts "До скорой встречи. Ваш результат на сегодня #{game.player.money - 100}"
     end
   end
+
+  def exit
+    "До скорой встречи. Ваш результат на сегодня #{game.player.money - 100}"
+  end
 end
-Interface.new.program

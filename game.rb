@@ -23,7 +23,11 @@ class Game
   end
 
   def take_card(user)
-    user.used_cards << @deck.cards.sample
+    if @bank.money >= 10
+      user.used_cards << @deck.cards.sample
+    else
+      puts "Вы не можете сделать ставку, ваш баланс #{player.money}."
+    end
   end
 
   def open_card
@@ -34,7 +38,7 @@ class Game
 
   def dealer_turn
     if dealer.score >= 17
-      puts 'Дилер пропускает ход'
+      puts 'Дилер пропускает ход.'
     else
       take_card(dealer)
     end
@@ -78,11 +82,11 @@ class Game
   def who_win(player_score, dealer_score)
     winner = spot_winner(player_score, dealer_score)
     if winner == player
-      puts "#{player_name}, вы победили"
+      puts "#{player_name}, вы победили!"
     elsif winner == dealer
-      puts 'Победа за Дилером! Вы проиграли'
+      puts 'Победа за Дилером! Вы проиграли.'
     else
-      puts 'Победителя нет'
+      puts 'Победителя нет.'
     end
     puts '*' * 70
   end

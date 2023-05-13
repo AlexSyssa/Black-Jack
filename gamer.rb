@@ -8,34 +8,18 @@ class Gamer
     @name = name
     @money = START_BALANCE
     @used_cards = []
-  end
-
-  def take_card(card)
-    @used_cards << card
-    @scope = count_points
+    @points = []
   end
 
   def score
-    total = 0
+    points = []
     @used_cards.each do |card|
-      total += if card.card == 'A'
-                 joker_point(total, card.value)
-               else
-                 card.value
-               end
+      points << if points.sum + card.value > 21 && (points.include?(11) || card.value == 11)
+                  card.value - 10
+                else
+                  card.value
+                end
     end
-    total
-  end
-
-  def joker_point(total, value)
-    if value + total <= 17
-      value
-    else
-      1
-    end
-  end
-
-  def reset
-    @used_cards.clear
+    points.sum
   end
 end
